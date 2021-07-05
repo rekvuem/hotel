@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/cabinet/layouts/menubar.blade.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/cabinet/selectroom.blade.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/cabinet/korpus.blade.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/home/welcome.blade.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/app/Http/Controllers/DashboardController.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/ajax/reservation.blade.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/cabinet/settings.blade.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/app/Http/Controllers/BronusController.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/app/Models/User.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/cabinet/showbron.blade.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/ajax/room.blade.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/cabinet/layouts/index.blade.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/app/Http/Controllers/Auth/LoginController.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/app/Http/Controllers/SettingController.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/cabinet/dashboard.blade.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/routes/web.php</file>
+        </group>
+    </open-files>
+</project-private>
