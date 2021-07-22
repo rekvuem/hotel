@@ -60,32 +60,3 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-
-          <tr class="bg-slate-800">
-            @forelse($TakeBron as $selectD)
-            <td>
-              {{$selectD->day}}
-            </td>
-            @empty
-            @endforelse
-          </tr>
-          <tr>       
-
-            @foreach($jsons_array as $key => $json_text)
-              @if(empty($json_text['jsontext']))
-            <td style="font-size: 0.92em">
-              -
-            </td>
-              @else
-            <td style="font-size: 0.92em">
-              <div class="">Занятость: {{ $jsons['takeVid'] }}</div>
-              <div class="">Имя Фамилия: {{ $jsons['fio'] }}</div>
-              <div class="">Телефон: {{ $jsons['telephon'] }}</div>    
-              <div class="">Комментарий: {{ $jsons['forText'] }}</div>
-            </td>
-              @endif
-            @endforeach
-
-
-          </tr>

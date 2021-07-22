@@ -5,93 +5,129 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Carbon\CarbonPeriod;
 
 class BronusController extends Controller {
 
-  public function showRooms() {
+  public function fullShowRoomOne(Request $r) {
 
-    dd("jghjh");
-    return view('cabinet.showbron', compact([
+    $korpus = $r->query('korpus');
+
+    $select_month = DB::table('user_active_year')->where('user_id', Auth::id())->first();
+
+    $month = DB::table('month')->where('id', $select_month->month_id)->first();
+
+    IF (empty($month->year))
+    {
+      abort('403', 'Активируйте актуальный месяц в настройках!');
+    }
+
+    $carbon_month = Carbon::parse($month->year . '-' . $month->month);
+    $carbon_days  = $carbon_month->daysInMonth;
+
+    $TakeRoom = DB::table('bron')
+            ->leftJoin('rooms', 'bron.room_id', '=', 'rooms.id_room')
+            ->where('corpus', $korpus)
+            ->select('room_id', 'room')
+            ->where('month_id', $month->id)
+            ->groupBy('room_id', 'room')->get();
+
+    $TakeRoomys = DB::table('bron')
+        ->leftJoin('rooms', 'bron.room_id', '=', 'rooms.id_room')
+        ->where('corpus', $korpus)
+        ->leftJoin('bron_info', 'bron.bron_info_id', '=', 'bron_info.id_bron')
+        ->where('month_id', $month->id)
+        ->get();
+
+//    массив с ключами для быстрого определения и построения таблиц с данными
+    $r = 0;
+    foreach ($TakeRoomys as $idroom)
+    {
+      $takemyroom[$r]['rowid']   = $idroom->id;
+      $takemyroom[$r]['bornid']  = $idroom->id_bron;
+      $takemyroom[$r]['roomid']  = $idroom->room_id;
+      $takemyroom[$r]['monthid'] = $idroom->month_id;
+      $takemyroom[$r]['day']     = $idroom->day;
+      $takemyroom[$r]['bron']    = $idroom->bron_info_id;
+
+      $takemyroom[$r]['takeVid'] = $idroom->takeVid;
+      $takemyroom[$r]['fio']     = $idroom->fio;
+      $takemyroom[$r]['telehon'] = $idroom->telehon;
+      $takemyroom[$r]['comment'] = $idroom->comment;
+
+      $r++;
+    }
+
+    return view('cabinet.fulllist', compact([
+      'TakeRoomys', 'TakeRoom', 'carbon_days', 'takemyroom',
     ]));
   }
 
   public function inserToBron(Request $req) {
-
-    $data = $req->only(['takeVid', 'fio', 'telephon', 'forText']);
-
-    $korpus       = $req->input('takeKorp');
-    $roomos       = $req->input('room');
-    $takeDate     = $req->input('takeBron');
-    $fio          = $req->input('fio');
-    $forText      = $req->input('forText');
+//  $data = $req->only(['takeVid', 'fio', 'telephon', 'forText']);
+    $korpus          = $req->input('takeKorp');
+    $roomos          = $req->input('room');
+    $get_date_range  = $req->input('takeBron_range');
+    $takeVid         = $req->input('takeVid');
+    $fio             = $req->input('fio');
+    $tel             = $req->input('telephon');
+    $forText         = $req->input('forText');
     /* ======================================================================================== */
-    $shortDate    = Str::of($takeDate)->substr(3);
-    $explode      = Str::of($takeDate)->explode('.');
-    $explode_Date = Str::of($shortDate)->explode('.');
-    /* ======================================================================================== */
-    IF (!DB::table('month')->where('month_year', $shortDate)->exists())
-    {
-      $month = DB::table('month')->insertOrIgnore([
-        'month'      => $explode_Date[0],
-        'year'       => $explode_Date[1],
-        'month_year' => $shortDate,
-      ]);
-    }
-    /* ================================INSERT TO BRON========================================== */
-    sleep(2);
-    $TakeRoom = DB::table('rooms')->get();
+    $range_date      = Str::of($get_date_range)->explode('-');
+    $Day_start       = Str::of($range_date[0])->substr(0, 2); //показать день
+    $shortDate_start = Str::of($range_date[0])->substr(3);  //показать месяц и год
+    $str_date_start  = Str::of($shortDate_start)->trim(); //показать месяц и год без пробела
+    $expl_start      = Str::of($str_date_start)->explode('.');
+    $Day_end         = Str::of($range_date[1])->substr(1, 2); //показать день
+    $shortDate_end   = Str::of($range_date[1])->substr(4);  //показать месяц и год
+    $str_date_end    = Str::of($shortDate_end)->trim(); //показать месяц и год без пробела
+    $expl_end        = Str::of($str_date_end)->explode('.');
 
-    $takeMonth = DB::table('month')->where('month_year', $shortDate)->first();
-    $selectos  = DB::table('bron')->where('month_id', $takeMonth->id)->first();
+    $z_start = $expl_start[1] . "-" . $expl_start[0] . "-" . $Day_start;
+    $z_end   = $expl_end[1] . "-" . $expl_end[0] . "-" . $Day_end;
 
-    $showDate = cal_days_in_month(CAL_GREGORIAN, $explode_Date[0], $explode_Date[1]);
-    foreach ($TakeRoom as $room)
-    {
-      IF (empty($selectos->month_id) >= $takeMonth->id)
-      {
-        for ($i = 1; $i <= $showDate; $i++)
-        {
-          DB::table('bron')->insertOrIgnore([
-            'room_id'  => $room->id,
-            'month_id' => $takeMonth->id,
-            'day'      => $i,
-          ]);
-        }
-      }
-    }
+    $z_format_start = $Day_start . "." . $expl_start[0] . "." . $expl_start[1];
+    $z_format_end   = $Day_end . "." . $expl_end[0] . "." . $expl_end[1];
+//  dd([$range_date,$Day_start,$shortDate_start,$str_date_start,$expl_start,$Day_end,$shortDate_end,$str_date_end,$expl_end]);
     /* =====================================UPDATE============================================= */
-    sleep(2);
-    $up = DB::table('bron')
-        ->where('room_id', '=', $roomos)
-        ->where('month_id', '=', $takeMonth->id)
-        ->where('day', '=', $explode[0])
-        ->update([
-      'jsontext' => json_encode($data, JSON_UNESCAPED_UNICODE),
+
+    $bron_info = DB::table('bron_info')->insertGetId([
+      'takeVid'         => $takeVid,
+      'fio'             => $fio,
+      'telehon'         => $tel,
+      'comment'         => $forText,
+      'bron_start_date' => $z_start,
+      'bron_end_date'   => $z_end,
     ]);
 
-    return redirect()->route('cabinet.dashboard');
-  }
-
-  /* =====================================CHECK BRON============================================= */
-
-  public function chooseroom(Request $req) {
-
-
-    $roomos   = $req->query('room');
-    $takeDate = $req->query('check');
-    $explode  = Str::of($takeDate)->explode('.');
-    $mon      = $explode[1].".".$explode[2];
-    $TakeMonth = DB::table('month')->where('month_year', '=',$mon)->first();
-
-    $takeDates = DB::table('bron')
+    DB::table('bron')
         ->where('room_id', '=', $roomos)
-        ->where('month_id', '=', $TakeMonth->id)
-        ->where('day', '=', $explode[0])->first();
-    
-    $jsons = json_decode($takeDates->jsontext, true); //декодирование текста
-    
-    return view('ajax.reservation', compact(['takeDates','jsons']));
+        ->whereBetween('month_year', [$z_start, $z_end])
+        ->update([
+          'bron_info_id' => $bron_info,
+    ]);
+
+    /* ================== ЛОГИ ========================================================= */
+    $select_number = DB::table('rooms')->where('id_room', $roomos)->first();
+    $LogAction     = [
+      'action'      => 'бронирование номера',
+      'vid'         => $takeVid,
+      'date_bron'   => $z_format_start . '-' . $z_format_end,
+      'korpus'      => $korpus,
+      'id_room'     => $roomos,
+      'number_room' => $select_number->room,
+      'fio'         => $fio,
+      'tel'         => $tel,
+      'comment'     => $forText,
+    ];
+    $this->MyActionLogs(Auth::id(), $LogAction);
+    /* ================== /ЛОГИ ========================================================= */
+
+    session()->flash('checkroom', 'Номер забронирован с ' . $z_format_start . ' по ' . $z_format_end);
+
+    return redirect()->route('cabinet.dashboard');
   }
 
 }

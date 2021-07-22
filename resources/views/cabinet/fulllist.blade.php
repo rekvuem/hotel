@@ -1,39 +1,26 @@
 @extends('cabinet.layouts.index')
-@section('title', 'Страница информация')
+@section('title', 'Полный список занятости')
 @section('content')
-
+<div class="result"></div>
 <div class="row">
   <div class="col-12">
     <div class="card">
-      <div class="btn-group">
-        @foreach($TakeYear as $year)
-        <div><a href="{{ route('cabinet.updateyearkorp', ['year'=>$year->id, 'korpus'=>request()->query('korpus')])}}" class="btn btn-sm">{{$year->month}}.{{$year->year}}</a></div>
-        @endforeach
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-12">
-    <div class="card">
-      <div class="card-body">
-        @foreach($TakeRoom as $room)
-        <a href="{{ route('cabinet.korpus',['korpus'=>$room->corpus, 'room'=>$room->id_room]) }}" class="btn btn-sm bg-blue-800 mt-1">{{$room->room}}</a>
-        @endforeach
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-3">
-    <div class="card">
-      <div class="card-body">
-        <table class="table table-bordered table-responsive">
-          @foreach($TakeRoomys as $selectD)  
-          @php
-          switch ($selectD->takeVid){
+      <table class="table table-bordered table-responsive datatable-basic">
+        <thead>
+          <tr class="text-center text-bold bg-slate-700" style="font-size: 1.3em; ">
+            <th>Дні</th>
+            @foreach($TakeRoom as $room) 
+            <th>{{ $room->room }}</th>
+            @endforeach  
+          </tr>
+        </thead>
+        <tbody> 
+          @for ($i = 1; $i <= $carbon_days; $i++) 
+          <tr>        
+            <td class="bg-slate-700">{{$i}}</td>
+            @foreach($takemyroom as $bron)
+            @php
+            switch ($bron['takeVid']){
             case 'заселен': $takeVidType= 'bg-teal-800';
             break;
             case 'забронирован': $takeVidType= 'bg-brown-800';
@@ -48,67 +35,84 @@
             break;
             default: $takeVidType= ' ';
             break;
-          }
-          @endphp
-          <tr>
-            <td class="text-center bg-slate-800">
-              {{ $selectD->day }}
-            </td>
-            @if($selectD->bron_info_id == null)
-            <td class="">
-               <a href="#" 
+            }
+            @endphp
+
+            @if($bron['day'] == $i)
+            @if($bron['bron'] == null)
+            <td class="{{$takeVidType}}">
+              <div class="">
+              <a href="#" 
                  class=" btn-icon bootbox_form text-purple-800" 
-                 data-room="{{ $selectD->room_id }}" 
-                 data-month="{{ $selectD->month_id }}" 
+                 data-room="{{ $bron['roomid'] }}" 
+                 data-month="{{ $bron['monthid'] }}" 
+                 data-bron="{{ $bron['bornid'] }}"
                  data-toggle="modal" 
                  data-target="#modal_theme_bg_custom"><i class="icon-pencil5"></i></a>
+              </div>
             </td>
-            
-            @elseif($selectD->takeVid == 'уборка')
-            <td class=" {{$takeVidType}}" style="font-weight: bold; font-size: 1.1em; font-style: italic">
+            @elseif($bron['takeVid'] == 'уборка')
+            <td class="{{$takeVidType}}" style="font-weight: bold; font-size: 1.1em; font-style: italic">
               уборка
             </td>
             @else
             <td class="{{$takeVidType}}">
               <div class="selectVid" 
-                   data-bron="{{ $selectD->id }}" 
+                   data-bron="{{ $bron['bornid'] }}" 
                    title="тип заннятости" 
                    style="width: 150px; font-style: italic; font-weight: bold;">
-                {{ $selectD->takeVid }}
+                {{ $bron['takeVid'] }}
               </div>
-              <div class="" title="Имя Фамилия гостя" style="font-weight: bold;"> {{ $selectD->fio }}</div>
-              <div class="" title="телефон"> {{ $selectD->telehon }}</div>
-              <div class="" title="комментарий"> {{ $selectD->comment }}</div>
+              <div class="" title="Имя Фамилия гостя" style="font-weight: bold;"> {{ $bron['fio'] }}</div>
+              <div class="" title="телефон"> {{ $bron['telehon'] }}</div>
+              <div class="" title="комментарий"> {{ $bron['comment'] }}</div>
             </td>
             @endif
+            @endif
+            @endforeach
           </tr>
-          @endforeach            
-          </tr>
-        </table>
-      </div>
+          @endfor 
+        </tbody>          
+      </table>
     </div>
   </div>
-  <div class="result"></div>
 </div>
-
 
 @endsection
 @section('page_java')
 <script src="{{ asset('theme/global_assets/js/plugins/ui/moment/moment.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('theme/global_assets/js/plugins/pickers/daterangepicker.js') }}" type="text/javascript"></script>
-<script src="{{ asset('theme/global_assets/js/plugins/forms/selects/select2.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('theme/global_assets/js/plugins/tables/datatables/datatables.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('theme/global_assets/js/plugins/forms/inputs/inputmask/jquery.inputmask.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('theme/global_assets/js/plugins/forms/selects/select2.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('theme/global_assets/js/plugins/notifications/bootbox.min.js') }}"></script>
 <script>
 $(document).ready(function () {
 
-  $('.select2').select2({
-    minimumResultsForSearch: Infinity
+//////////////////////////////////////////////////////////////////////////////////
+  $('.datatable-basic').DataTable({
+   fixedHeader: { 
+      header: true, 
+      footer: true 
+    },
+    autoWidth: true,
+    responsive: true,
+    stateSave: true,
+    searching: false,
+    lengthChange: false,
+    info: false,
+    ordering: false,
+    paginate: false,
+    pageLength: 31,
+    dom: '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
+    language: {
+      paginate: {'first': 'First', 'last': 'Last', 'next': '→', 'previous': '←'}
+    }
   });
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-$('.bootbox_form').on('click', function () {
+   
+//////////////////////////////////////////////////////////////////////////////////
+  $('.bootbox_form').on('click', function () {
 
     var room = $(this).data('room');
     var month = $(this).data('month');
@@ -136,7 +140,7 @@ $('.bootbox_form').on('click', function () {
               + '<div class="form-group">'
               + '<select name="takeVid" class="form-control select2">'
               + '<option value="забронирован">забронировать</option>'
-              + '<option value="заселен">заселение</option>'
+              + '<option value="заселен">заселены</option>'
               + '<option value="уборка">уборка комнаты</option>'
               + '<option value="ремонт">ремонт комнаты</option>'
               + '</select>'
@@ -213,9 +217,62 @@ $('.bootbox_form').on('click', function () {
       $(".bootbox.modal").find(".modal-header").addClass('bg-blue-800');
     });
   });
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-$('.selectVid').on('click', function () {
+//////////////////////////////////////////////////////////////////////////////////
+//  $('.empty_bron').on('click', function () {
+//    var empty_clean = $(this).data('clean');
+//    var empty_clean_room = $(this).data('room');
+//
+//    bootbox.prompt({
+//      title: "Выбрать тип заннятости!",
+//      inputType: 'select',
+//      className: 'text-brown-300 select2',
+//      locale: 'ru',
+//      multiple: false,
+//      buttons: {
+//        confirm: {
+//          label: 'изменить',
+//          className: 'bg-green-600'
+//        },
+//        cancel: {
+//          label: 'отмена',
+//          className: 'bg-danger-400'
+//        }
+//      },
+//      inputOptions: [
+//        {
+//          text: 'Выбрать...',
+//          value: '',
+//        },
+//        {
+//          text: 'уборка',
+//          value: 'уборка',
+//        }
+//      ],
+//      callback: function (result) {
+//
+//        if (result == 'уборка') {
+//          $.ajax({
+//            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+//            method: 'POST',
+//            url: "{{ route('cabinet.insertAjaxBron') }}",
+//            data: {_method: 'POST', id: empty_clean, room: empty_clean_room},
+//            success: function () {
+//              setTimeout("location.reload(true);", 100);
+//            },
+//            error: function () {
+//              console.log('ошибка');
+//            }
+//          });
+//        }
+//
+//      }
+//    }).init(function() {
+//      $(".bootbox.modal").find(".modal-header").addClass('bg-blue-800');
+//  });
+//
+//  });
+//////////////////////////////////////////////////////////////////////////////////
+  $('.selectVid').on('click', function () {
     var broning = $(this).data('bron');
     bootbox.prompt({
       title: "Выбрать тип заннятости!",
@@ -247,7 +304,7 @@ $('.selectVid').on('click', function () {
           value: 'заселен',
         },
         {
-          text: 'выселение',
+          text: 'выселен',
           value: 'выселен',
         }
       ],

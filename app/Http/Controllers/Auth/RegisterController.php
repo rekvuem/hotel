@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class RegisterController extends Controller {
   /*
@@ -61,12 +62,20 @@ use RegistersUsers;
    * @return \App\Models\User
    */
   protected function create(array $data) {
-    return User::create([
+    $user = User::create([
           'imya'     => $data['imya'],
           'familia'  => $data['familia'],
           'email'    => $data['email'],
           'password' => Hash::make($data['password']),
     ]);
+    
+    
+    $db= DB::table('user_active_year')->insert([
+      'user_id'=> $user->id,
+    ]);
+        
+    
+    return $user;
   }
 
 }

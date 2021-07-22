@@ -6,114 +6,64 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller {
   /* ====================================================================================== */
 
   public function dashboard(Request $request) {
     $User_month = DB::table('user_active_year')->where('user_id', Auth::id())->first();
-    Cookie::queue(Cookie::forever('monthing', $User_month->month_id));
-
-    $month = DB::table('month')->get();
-
-    if (empty($request->query('korpus')))
-    {
-      $room = DB::table('rooms')->where('corpus', 1)->get();
+    $User_month_year = DB::table('month')->where('id', $User_month->month_id)->first();
+    if(empty($User_month->month_id)){
+    
+    }else{
+      Cookie::queue(Cookie::forever('monthing', $User_month->month_id));
+      Cookie::queue(Cookie::forever('month_year_text', $User_month_year->month_year));
     }
-    return view('cabinet.dashboard', compact([
-      'month', 'room'
-    ]));
+    $carbon_now = Carbon::now();
+    $parse_carbon_now = Carbon::parse($carbon_now);
+    $time = $parse_carbon_now->year."-".$parse_carbon_now->month."-".$parse_carbon_now->day;
+
+    
+    $getBron_now = DB::table('bron')
+        ->where('month_year', '=', $time)
+        ->leftJoin('rooms', 'bron.room_id', '=', 'rooms.id_room')
+        ->leftJoin('bron_info', 'bron.bron_info_id', '=', 'bron_info.id_bron')
+        ->get();
+
+    return view('cabinet.dashboard', compact(['getBron_now']));
   }
 
   /* ====================================================================================== */
 
-  public function korpus(Request $request, $korp) {
-    $sel = $request->query('room');
+  public function korpus(Request $request) {
+    $sel    = $request->query('room');
+    $korpus = $request->query('korpus');
 
-    $TakeRoom = DB::table('rooms')->where('corpus', $korp)->get();
-
+    $TakeYear   = DB::table('month')->orderBy('month_year', 'desc')->get();
+    $TakeRoom   = DB::table('rooms')->where('corpus', $korpus)->get();
     $User_month = DB::table('user_active_year')->where('user_id', Auth::id())->first();
-    $month      = DB::table('month')->where('id', $User_month->id)->first();
-    $jsons      = '';
-    IF (!empty($sel))
-    {
-      $TakeBron    = DB::table('bron')
-          ->leftJoin('rooms', 'bron.room_id', '=', 'rooms.id')
-          ->where('room_id', $sel)
-          ->where('month_id', $User_month->id)
-          ->get();
-//dd($TakeBron);
-      $jsons_array = json_decode($TakeBron, true);
-      sleep(1);
-//
-//      foreach ($jsons_array as $gettext)
-//      {
-//        $jsons            = json_decode($gettext['jsontext'], true);
-//        $jsons['takeVid'] = null;
-//        IF (isset($jsons['takeVid']))
-//        {
-//          $jsons['takeVid'];
-//        } else
-//        {
-//          $jsons['takeVid'] = 'забронировано';
-//        }
-//      }
-    } else
-    {
-      $TakeBron    = DB::table('bron')
-          ->leftJoin('rooms', 'bron.room_id', '=', 'rooms.id')
-          ->where('room_id', $sel)
-          ->where('month_id', $User_month->month_id)
-          ->get();
-      $jsons_array = json_decode($TakeBron, true);
+    $month      = DB::table('month')->where('id', $User_month->month_id)->first();
 
-      $jsons = '';
+    IF (empty($month->year))
+    {
+      abort('403', 'Активируйте актуальный месяц в настройках!');
     }
+    
+    $carbon_month = Carbon::parse($month->year . '-' . $month->month);
+    $carbon_days  = $carbon_month->daysInMonth;
 
-    return view('cabinet.korpus', compact(['TakeRoom', 'TakeBron', 'month', 'jsons', 'jsons_array']));
-  }
+    $TakeRoomys = DB::table('bron')
+        ->leftJoin('rooms', 'bron.room_id', '=', 'rooms.id_room')
+        ->leftJoin('bron_info', 'bron.bron_info_id', '=', 'bron_info.id_bron')
+        ->where('room_id', $sel)
+        ->where('month_id', $month->id)
+        ->get();
 
-  /* ====================================================================================== */
-
-  public function selectLevel(Request $req) {
-    $getkorpus = $req->all('getroom');
-    $Room      = DB::table('rooms')->where('corpus', $getkorpus)->get();
-
-    return view('ajax.room', compact([
-      'Room',
+    return view('cabinet.korpus', compact([
+      'TakeRoomys', 'TakeRoom', 'carbon_days', 'TakeYear',
     ]));
-  }
-
-  /* ====================================================================================== */
-
-  public function updateYear($update) {
-
-    $Roomed   = DB::table('rooms')->get();
-    $Month    = DB::table('month')->where('id', $update)->first();
-    $showDate = cal_days_in_month(CAL_GREGORIAN, $Month->month, $Month->year);
-    $selectos = DB::table('bron')->where('month_id', $Month->id)->first();
-    foreach ($Roomed as $rooming)
-    {
-
-      IF (empty($selectos->month_id) >= $Month->id)
-      {
-        for ($i = 1; $i <= $showDate; $i++)
-        {
-          DB::table('bron')->insertOrIgnore([
-            'room_id'  => $rooming->id,
-            'month_id' => $Month->id,
-            'day'      => $i,
-          ]);
-        }
-      }
-    }
-
-    DB::table('user_active_year')
-        ->where('user_id', Auth::id())->update([
-      'month_id' => $update,
-    ]);
-    Cookie::queue(Cookie::forever('monthing', $update));
-    return redirect()->route('cabinet.dashboard');
   }
 
 }

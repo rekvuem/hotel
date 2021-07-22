@@ -32,8 +32,8 @@
     <script src="{{ asset('theme/global_assets/js/plugins/ui/perfect_scrollbar.min.js') }}"></script>
     <script src="{{ asset('theme/global_assets/js/plugins/ui/slinky.min.js') }}"></script>
     <script src="{{ asset('theme/global_assets/js/main/bootstrap.bundle.min.js') }}"></script>
-<!--    <script src="{{ asset('theme/global_assets/js/plugins/velocity/velocity.min.js') }}"></script>
-    <script src="{{ asset('theme/global_assets/js/plugins/velocity/velocity.ui.min.js') }}"></script>-->
+    <!--<script src="{{ asset('theme/global_assets/js/plugins/velocity/velocity.min.js') }}"></script>-->
+    <!--<script src="{{ asset('theme/global_assets/js/plugins/velocity/velocity.ui.min.js') }}"></script>-->
     <script src="{{ asset('theme/assets/js/app_cabinet.js') }}"></script>
     <!--<script src="{{ asset('theme/assets/js/animations_velocity_examples.js') }}"></script>-->
     <script src="{{ asset('theme/assets/js/custom.js') }}"></script>

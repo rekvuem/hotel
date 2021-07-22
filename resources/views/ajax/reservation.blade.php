@@ -8,9 +8,9 @@
 			                	</div>
 							</div>
 							<div class="card-body">
-								<div class="">Имя Фамилия: {{$jsons['fio']}}</div>
-        <div class="">Телефон: {{$jsons['telephon']}}</div>    
-        <div class="">Занятость: {{$jsons['takeVid']}}</div>
-        <div class="">Комментарий: {!!$jsons['forText']!!}</div>
+         <div >Тип: {{$FirstTakeDate->takeVid}}</div>
+         <div >Имя Фамилия: {{$FirstTakeDate->fio}}</div>
+         <div >Телефон: {{$FirstTakeDate->telephon}}</div>
+         <div >Коментарий: {{$FirstTakeDate->forText}}</div>
 							</div>
 						</div>
