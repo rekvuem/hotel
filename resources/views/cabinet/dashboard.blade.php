@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="row">
-  <div class="col-2 col-md-2 col-sm-12">
+  <div class="col-12 col-xl-2 col-md-3">
     <div class="card">
       <div class="card-body">
         <form action="{{ route('cabinet.insertToBron') }}" method="POST">
@@ -30,12 +30,13 @@
           </div>
           <div class="form-group showroom">
           </div>
+
           <div class="form-group">
-            <input type="text" name="fio" class="form-control" value="" placeholder="Имя Фамилия" >
+            <input type="text" name="fio" class="form-control" required="" placeholder="Имя Фамилия"  value="">
           </div>
 
           <div class="form-group">
-            <input id="number_mobile" class="form-control" type="text" name="telephon" placeholder="Телефон" value="">
+            <input class="form-control" type="text" name="telephon" placeholder="Номер телефона" required="" value="">
           </div>
 
           <div class="form-group">
@@ -54,7 +55,7 @@
       </div>
     </div>
   </div>
-  <div class="col-9">
+  <div class="col-xl-10 col-12 col-md-5">
     <div class="row">
       @foreach ($getBron_now as $now)
         @if($now->month_year == $now->bron_end_date)
@@ -82,9 +83,12 @@
         </div>
         @endif
       </div>      
-      <div class="col-6"></div>
+      <div class="col-6">
+
+      </div>
     </div>
     <div class="reverse"></div>
+    <div class="reverse_room"></div>
   </div>
 </div>
 
@@ -93,12 +97,9 @@
 <script src="{{ asset('theme/global_assets/js/plugins/ui/moment/moment.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('theme/global_assets/js/plugins/pickers/daterangepicker.js') }}" type="text/javascript"></script>
 <script src="{{ asset('theme/global_assets/js/plugins/forms/selects/select2.min.js') }}" type="text/javascript"></script>
-<script src="{{ asset('theme/global_assets/js/plugins/forms/inputs/inputmask/jquery.inputmask.min.js') }}" type="text/javascript"></script>
+
 <script>
 $(document).ready(function () {
-
-  $('#number_mobile').inputmask("+38(099) 999-99-99");
-
   $('.takeKorpus').change(function () {
     $('.getDate_start').change('click', function () {
       var get_korpus = $('.takeKorpus').val();
@@ -106,7 +107,7 @@ $(document).ready(function () {
 
       $.ajax({
         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-        method: 'get',
+        method: 'GET',
         url: "{{ route('cabinet.freeroom') }}",
         data: {korpus: get_korpus, daterange: data_range},
         success: function (data) {
@@ -114,27 +115,27 @@ $(document).ready(function () {
         }
       });
 
-
       $.ajax({
         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-        method: 'get',
+        method: 'GET',
         url: "{{ route('cabinet.listfreeroom') }}",
         data: {korpus: get_korpus, daterange: data_range},
         success: function (data) {
+          
           $('.showroom').html(data);
+        
         }
       });
 
-
-
     });
+    
 
   });
 
   $('.daterange-locale').daterangepicker({
     applyClass: 'btn-sm btn-success',
     cancelClass: 'btn-sm btn-light',
-    minDate: '01.06.2021',
+    minDate: '01.07.2021',
     opens: 'right',
     locale: {
       format: 'DD.MM.YYYY',

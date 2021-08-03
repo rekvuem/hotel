@@ -5,14 +5,21 @@
         <group>
             <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/ajax/listfreeroom.blade.php</file>
             <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/cabinet/layouts/menubar.blade.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/cabinet/korpus.blade.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/text</file>
             <file>file:/J:/OpenServer80/domains/hotel.local/app/Http/Controllers/DashboardController.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/lang/en/pagination.php</file>
             <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/cabinet/layouts/navbar.blade.php</file>
             <file>file:/J:/OpenServer80/domains/hotel.local/app/Http/Controllers/AjaxController.php</file>
-            <file>file:/J:/OpenServer80/domains/hotel.local/app/Http/Controllers/Auth/RegisterController.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/lang/ru/pagination.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/ajax/reservation.blade.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/app/Providers/AppServiceProvider.php</file>
             <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/cabinet/fulllist.blade.php</file>
             <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/cabinet/settings.blade.php</file>
             <file>file:/J:/OpenServer80/domains/hotel.local/app/Http/Controllers/BronusController.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/ajax/onefreeroom.blade.php</file>
             <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/ajax/freeroom.blade.php</file>
+            <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/cabinet/layouts/index.blade.php</file>
             <file>file:/J:/OpenServer80/domains/hotel.local/app/Http/Controllers/SettingController.php</file>
             <file>file:/J:/OpenServer80/domains/hotel.local/resources/views/cabinet/dashboard.blade.php</file>
             <file>file:/J:/OpenServer80/domains/hotel.local/routes/web.php</file>

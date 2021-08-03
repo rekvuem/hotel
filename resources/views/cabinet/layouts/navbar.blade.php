@@ -4,7 +4,7 @@
 
 		<div class="collapse navbar-collapse" id="navbar-mobile">
     <ul class="navbar-nav ml-md-3 mr-md-auto">
-      Кабинет упраления регистрации/бронирование гостей
+      Кабинет управления регистрации/бронирование гостей
     </ul>
 
     <ul class="navbar-nav">

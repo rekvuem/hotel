@@ -39,6 +39,8 @@ class BronusController extends Controller {
         ->where('corpus', $korpus)
         ->leftJoin('bron_info', 'bron.bron_info_id', '=', 'bron_info.id_bron')
         ->where('month_id', $month->id)
+        ->leftJoin('month', 'bron.month_id', '=', 'month.id')
+        ->where('month_id', $month->id)
         ->get();
 
 //    массив с ключами для быстрого определения и построения таблиц с данными
@@ -50,7 +52,11 @@ class BronusController extends Controller {
       $takemyroom[$r]['roomid']  = $idroom->room_id;
       $takemyroom[$r]['monthid'] = $idroom->month_id;
       $takemyroom[$r]['day']     = $idroom->day;
+      $takemyroom[$r]['month']   = $idroom->month_year;
       $takemyroom[$r]['bron']    = $idroom->bron_info_id;
+      
+      $takemyroom[$r]['start_date']    = $idroom->bron_start_date;
+      $takemyroom[$r]['end_date']    = $idroom->bron_end_date;
 
       $takemyroom[$r]['takeVid'] = $idroom->takeVid;
       $takemyroom[$r]['fio']     = $idroom->fio;

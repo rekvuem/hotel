@@ -56,8 +56,10 @@ class DashboardController extends Controller {
 
     $TakeRoomys = DB::table('bron')
         ->leftJoin('rooms', 'bron.room_id', '=', 'rooms.id_room')
-        ->leftJoin('bron_info', 'bron.bron_info_id', '=', 'bron_info.id_bron')
         ->where('room_id', $sel)
+        ->leftJoin('bron_info', 'bron.bron_info_id', '=', 'bron_info.id_bron')
+        ->where('month_id', $month->id)
+       ->leftJoin('month', 'bron.month_id', '=', 'month.id')
         ->where('month_id', $month->id)
         ->get();
 

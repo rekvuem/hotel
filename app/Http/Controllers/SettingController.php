@@ -14,7 +14,7 @@ class SettingController extends Controller {
 
   public function settinging(Request $request) {
 
-    $TakeYear = DB::table('month')->orderBy('month_year', 'desc')->orderBy('month', 'asc')->paginate(12);
+    $TakeYear = DB::table('month')->orderBy('month_year', 'desc')->orderBy('month', 'asc')->simplePaginate(12);
     $room_1   = DB::table('rooms')->where('corpus', 1)->orderBy('room', 'asc')->get();
     $room_2   = DB::table('rooms')->where('corpus', 2)->orderBy('room', 'asc')->get();
         

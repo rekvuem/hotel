@@ -11,18 +11,28 @@ use Illuminate\Support\Facades\DB;
 class AjaxController extends Controller {
 
   public function updatetypebron(Request $req) {
+    $bron = $req->input('bron');
+    $vid  = $req->input('takeVid');
 
-    $type     = $req->input('idtype');
-    $takeDate = $req->input('optionType');
-
-    DB::table('bron_info')
-        ->where('id_bron', $type)
-        ->update([
-          'takeVid' => $takeDate,
+    DB::table('bron_info')->where('id_bron', $bron)->update([
+      'takeVid' => $vid
     ]);
-
-//    return true;
   }
+
+  /*   * ********************************************************************************************************** */
+
+  public function deletetypebron(Request $req) {
+    $bron       = $req->input('bronus');
+    $room       = $req->input('room');
+    $start_date = $req->input('start_date');
+    $end_date   = $req->input('end_date');
+
+    DB::table('bron_info')->where('id_bron', $bron)->delete();
+    DB::table('bron')->where('bron_info_id', $bron)->where('room_id', $room)->whereBetween('month_year', [$start_date, $end_date])
+        ->update(['bron_info_id' => null]);
+  }
+
+  /*   * ********************************************************************************************************** */
 
   public function insertAjaxBron(Request $req) {
 
@@ -40,8 +50,9 @@ class AjaxController extends Controller {
     return true;
   }
 
-  public function chooseroom(Request $req) {
+  /*   * ********************************************************************************************************** */
 
+  public function chooseroom(Request $req) {
 
     $roomos    = $req->query('room');
     $takeDate  = $req->query('check');
@@ -57,58 +68,28 @@ class AjaxController extends Controller {
     return view('ajax.reservation', compact(['FirstTakeDate']));
   }
 
+  /* ========================================свободные комнаты===================================================== */
+
   public function freeroom(Request $rq) {
     $daterange = $rq->query('daterange');
+    $korpus    = $rq->query('korpus');
     $explode   = Str::of($daterange)->explode('-');
 
     $start_date = Str::of($explode[0])->trim();
     $start_end  = Str::of($explode[1])->trim();
 
     $sub_date_start        = Carbon::parse($start_date);
-    $new_format_date_start = $sub_date_start->year . "-" . $sub_date_start->month . "-" . $sub_date_start->day;
+    $new_format_date_start = $sub_date_start->format('Y-m-d');
     $sub_date_end          = Carbon::parse($start_end);
-    $new_format_date_end   = $sub_date_end->year . "-" . $sub_date_end->month . "-" . $sub_date_end->day;
+    $new_format_date_end = $sub_date_end->format('Y-m-d');
+
+    $getRoom = DB::table('rooms')->where('corpus', $korpus)->get();
 
     $getRange = DB::table('bron')
         ->leftJoin('rooms', 'bron.room_id', '=', 'rooms.id_room')
-        ->where('corpus', $rq->query('korpus'))
+        ->where('corpus', $korpus)
         ->whereBetween('month_year', [$new_format_date_start, $new_format_date_end])
         ->leftJoin('bron_info', 'bron.bron_info_id', '=', 'bron_info.id_bron')
-        ->get();
-
-    $free = 0;
-    foreach ($getRange as $dates)
-    {
-//      $month = Carbon::parse($dates->month_year);
-      $month                    = Str::of($dates->month_year)->explode('-');
-      $freeshown[$free]['date'] = $month[2] . "." . $month[1] . "." . $month[0];
-      $freeshown[$free]['room'] = $dates->room;
-      $freeshown[$free]['vid']  = $dates->takeVid;
-      $free++;
-    }
-
-
-    return view('ajax.freeroom', compact(['getRange', 'freeshown']));
-  }
-
-  public function listfreeroom(Request $rq) {
-    $daterange = $rq->query('daterange');
-    $explode   = Str::of($daterange)->explode('-');
-
-    $start_date = Str::of($explode[0])->trim();
-    $start_end  = Str::of($explode[1])->trim();
-
-    $sub_date_start        = Carbon::parse($start_date);
-    $new_format_date_start = $sub_date_start->year . "-" . $sub_date_start->month . "-" . $sub_date_start->day;
-    $sub_date_end          = Carbon::parse($start_end);
-    $new_format_date_end   = $sub_date_end->year . "-" . $sub_date_end->month . "-" . $sub_date_end->day;
-
-    $getRange = DB::table('bron')
-        ->leftJoin('rooms', 'bron.room_id', '=', 'rooms.id_room')
-        ->where('corpus', $rq->query('korpus'))
-        ->whereBetween('month_year', [$new_format_date_start, $new_format_date_end])
-        ->leftJoin('bron_info', 'bron.bron_info_id', '=', 'bron_info.id_bron')
-        ->whereNull('takeVid')
         ->get();
 
     $free = 0;
@@ -117,14 +98,126 @@ class AjaxController extends Controller {
 //      $month = Carbon::parse($dates->month_year);
       $month                      = Str::of($dates->month_year)->explode('-');
       $freeshown[$free]['date']   = $month[2] . "." . $month[1] . "." . $month[0];
+      /* ===================================== */
+      $freeshown[$free]['idroom'] = $dates->id_room; // информация с базы данных комнат rooms
+      $freeshown[$free]['roomid'] = $dates->room_id; // информация с базы по бронированию
+      $freeshown[$free]['room']   = $dates->room; // информация номера комнаты с базы данных комнат rooms
+      $freeshown[$free]['price']  = $dates->price; // информация цены комнаты с базы данных комнат rooms
+      /* ===================================== */
+      $new_start_format_date   = Carbon::parse($dates->bron_start_date); //данные бронирования с началы даты
+      $freeshown[$free]['bron_st_date'] = $new_start_format_date->format('d.m.Y');
+      $new_end_format_date   = Carbon::parse($dates->bron_end_date);  //данные бронирования с конец даты
+      $freeshown[$free]['bron_en_date'] = $new_end_format_date->format('d.m.Y');
+      /* ===================================== */
+      $freeshown[$free]['vid']    = $dates->takeVid;
+      $freeshown[$free]['fio']   = $dates->fio;
+      $freeshown[$free]['tel']   = $dates->telehon;
+      $freeshown[$free]['com']   = $dates->comment;
+      $free++;
+    }
+
+
+    return view('ajax.freeroom', compact(['getRoom', 'getRange', 'freeshown']));
+  }
+
+  /*   * ********************************************************************************************************** */
+
+  public function listfreeroom(Request $rq) {
+
+//    $room      = $rq->query('roomid');
+    $daterange = $rq->query('daterange');
+    $korpus    = $rq->query('korpus');
+
+    $explode = Str::of($daterange)->explode('-');
+
+    $start_date = Str::of($explode[0])->trim();
+    $start_end  = Str::of($explode[1])->trim();
+
+    $sub_date_start        = Carbon::parse($start_date);
+    $new_format_date_start = $sub_date_start->format('Y-m-d');
+    $sub_date_end          = Carbon::parse($start_end);
+    $new_format_date_end   = $sub_date_end->format('Y-m-d');
+
+    $getRoom = DB::table('rooms')->where('corpus', $korpus)->get();
+
+    $getRange = DB::table('bron')
+        ->leftJoin('rooms', 'bron.room_id', '=', 'rooms.id_room')
+        ->where('corpus', $korpus)
+        ->whereBetween('month_year', [$new_format_date_start, $new_format_date_end])
+        ->leftJoin('bron_info', 'bron.bron_info_id', '=', 'bron_info.id_bron')
+        ->whereNull('takeVid')
+        ->get();
+
+    $free = 0;
+    foreach ($getRange as $dates)
+    {
+      $month                      = Str::of($dates->month_year)->explode('-');
+      $freeshown[$free]['date']   = $month[2] . "." . $month[1] . "." . $month[0];
+      $freeshown[$free]['idroom'] = $dates->id_room;
       $freeshown[$free]['roomid'] = $dates->room_id;
-      $freeshown[$free]['room']   = $dates->room;
+      $freeshown[$free]['room']   = $dates->room;      
       $freeshown[$free]['vid']    = $dates->takeVid;
       $free++;
     }
 
-    return view('ajax.listfreeroom', compact(['getRange', 'freeshown']));
+    return view('ajax.listfreeroom', compact(['getRoom', 'getRange', 'freeshown']));
   }
+
+  /*   * ********************************************************************************************************** */
+
+  public function shownoneroom(Request $rq) {
+
+    $room      = $rq->query('roomid');
+    $daterange = $rq->query('daterange');
+    $korpus    = $rq->query('korpus');
+
+    $explode = Str::of($daterange)->explode('-');
+
+    $start_date = Str::of($explode[0])->trim();
+    $start_end  = Str::of($explode[1])->trim();
+
+    $sub_date_start        = Carbon::parse($start_date);
+    $new_format_date_start = $sub_date_start->format('Y-m-d');
+    $sub_date_end          = Carbon::parse($start_end);
+    $new_format_date_end   = $sub_date_end->format('Y-m-d');
+
+    $getRoom = DB::table('rooms')->where('corpus', $korpus)->get();
+
+    $getRange = DB::table('bron')
+        ->leftJoin('rooms', 'bron.room_id', '=', 'rooms.id_room')
+        ->where('corpus', $korpus)
+        ->where('id_room', $room)
+        ->whereBetween('month_year', [$new_format_date_start, $new_format_date_end])
+        ->leftJoin('bron_info', 'bron.bron_info_id', '=', 'bron_info.id_bron')
+        ->get();
+
+    $free = 0;
+    foreach ($getRange as $dates)
+    {
+      $month                      = Str::of($dates->month_year)->explode('-');
+      $freeshown[$free]['date']   = $month[2] . "." . $month[1] . "." . $month[0];
+      /* ===================================== */
+      $freeshown[$free]['idroom'] = $dates->id_room; // информация с базы данных комнат rooms
+      $freeshown[$free]['roomid'] = $dates->room_id; // информация с базы по бронированию
+      $freeshown[$free]['room']   = $dates->room; // информация номера комнаты с базы данных комнат rooms
+      $freeshown[$free]['price']  = $dates->price; // информация цены комнаты с базы данных комнат rooms
+      /* ===================================== */
+      $new_start_format_date   = Carbon::parse($dates->bron_start_date); //данные бронирования с началы даты
+      $freeshown[$free]['bron_st_date'] = $new_start_format_date->format('d.m.Y');
+      $new_end_format_date   = Carbon::parse($dates->bron_end_date);  //данные бронирования с конец даты
+      $freeshown[$free]['bron_en_date'] = $new_end_format_date->format('d.m.Y');
+      /* ===================================== */
+      $freeshown[$free]['vid']    = $dates->takeVid;
+      $freeshown[$free]['fio']   = $dates->fio;
+      $freeshown[$free]['tel']   = $dates->telehon;
+      $freeshown[$free]['com']   = $dates->comment;
+      $free++;
+    }
+
+    return view('ajax.onefreeroom', compact(['getRoom', 'getRange', 'freeshown']));
+  }
+
+  /*   * ********************************************************************************************************** */
 
   public function insertFastBron(Request $req) {
 
@@ -146,7 +239,6 @@ class AjaxController extends Controller {
 
     $z_start = $Carbon_start->year . "-" . $Carbon_start->month . "-" . $Carbon_start->day;
     $z_end   = $Carbon_end->year . "-" . $Carbon_end->month . "-" . $Carbon_end->day;
-
     /* =====================================UPDATE============================================= */
 
     $bron_info = DB::table('bron_info')->insertGetId([
@@ -174,13 +266,13 @@ class AjaxController extends Controller {
     $price_room = $req->input('priceofroom');
     $number     = $req->input('roomnumber');
     DB::table('rooms')
-        ->where('id_room', 1)
+        ->where('id_room', $room)
         ->update(['price' => $price_room]);
 
     /* ================== ЛОГИ ========================================================= */
     $LogAction = [
       'action'      => 'изменена цена',
-      'id_room' => $room,
+      'id_room'     => $room,
       'number_room' => $number,
       'price'       => $price_room,
       'commentar'   => null,
@@ -204,7 +296,7 @@ class AjaxController extends Controller {
       /* ================== ЛОГИ ========================================================= */
       $LogAction = [
         'action'      => 'комментарий удален',
-        'id_room' => $room,
+        'id_room'     => $room,
         'number_room' => $number,
         'price'       => null,
         'commentar'   => null,
@@ -222,7 +314,7 @@ class AjaxController extends Controller {
     /* ================== ЛОГИ ========================================================= */
     $LogAction = [
       'action'      => 'комментарий изменен',
-      'id_room' => $room,
+      'id_room'     => $room,
       'number_room' => $number,
       'price'       => null,
       'commentar'   => $com_room,

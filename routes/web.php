@@ -39,8 +39,12 @@ Route::prefix('/cabinet')->name('cabinet.')->namespace('Cabinet')->middleware(['
   /*   * ************************************************************************************************** */
   Route::get('/freeroom', [AjaxController::class, 'freeroom'])->name('freeroom');
   Route::get('/listfreeroom', [AjaxController::class, 'listfreeroom'])->name('listfreeroom');
-
-  Route::put('/updatetype', [AjaxController::class, 'updatetypebron'])->name('updateTypeBron');
+  Route::get('/shownoneroom', [AjaxController::class, 'shownoneroom'])->name('shownoneroom');
+  
+  Route::delete('/deletetype', [AjaxController::class, 'deletetypebron'])->name('deleteTypeBron');
+  
+  Route::post('/updatetype', [AjaxController::class, 'updatetypebron'])->name('updateTypeBron');
+  
   Route::put('/updateroominfo', [AjaxController::class, 'updateInfoRoom'])->name('updateroominfo');
   Route::put('/updateroomcomment', [AjaxController::class, 'updateInfoComment'])->name('updateroominfocomment'); 
   

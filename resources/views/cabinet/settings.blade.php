@@ -48,14 +48,15 @@
         @foreach($TakeYear as $year)
         <div><a href="{{ route('cabinet.updateyear', $year->id)}}" class="">{{$year->month}}.{{$year->year}}</a></div>
         @endforeach
+        {{$TakeYear->links()}}
       </div>
     </div>
 
     <div class="card">
-      <div class="card-header bg-blue-400">Очистка БД</div>
+      <div class="card-header bg-blue-400">Управление базой данных</div>
       <div class="card-body">
-        <a class="btn" href="{{route('cabinet.getClear')}}">Кеш</a>
-        <button class="btn">логи</button>
+        <a class="btn" href="{{route('cabinet.getClear')}}">Очистить кеш сайта</a>
+        
       </div>
     </div>
   </div>
@@ -95,20 +96,22 @@
     <div class="card">
       <div class="card-header bg-violet-800 p-1" style="font-size: 1.3em">FAQ (помощь)</div>
       <div class="card-body">
-        <p class=""><b>добавить месяц/год</b> - при добавлении месяца автоматически проставляются существующие комнаты которые расположены в правой стороне страницы. В списоке месяцев будет показыватся 12 последних записей, чтоб использовать список активного месяца нужно выбрать и нажать просто на месяц чтоб активировать.</p>
+        <p class=""><b>добавить месяц/год</b> - при добавлении месяца автоматически проставляются существующие комнаты которые расположены в правой стороне страницы. В списке месяцев будет показыватся 12 последних записей, чтоб использовать список активного месяца нужно выбрать и нажать на месяц чтоб активировать.</p>
 
         <p class=""><b>добавить комнаты</b> - </p>
 
-        <p class=""><b>редактироввние комнаты</b> - редактировать можно цены и описание комнат, при завершении редактирование нужно нажать <b>Enter</b></p>
+        <p class=""><b>редактирование комнаты</b> - редактировать можно цены и описание комнат, при завершении редактирование нужно нажать <b>Enter</b></p>
+
+        <p class=""><b>Активация месяца</b> - для активации месяца Вам нужно нажать на добавленный при перезагрузки у Вас отобразится в меню Активный месяц</p>
       </div>
     </div>
 
 
   </div>
-  <div class="col-2">
+  <div class="col-3">
     <div class="card">
-      Корпус №1
-      <table>
+      <div class="card-header font-weight-bold">Корпус №1</div>
+      <table class="table table-bordered">
         <thead>
           <tr>
             <td>комната</td>
@@ -142,10 +145,10 @@
       </table>
     </div>
   </div>  
-  <div class="col-2">
+  <div class="col-3">
     <div class="card">
-      Корпус №2
-      <table>
+      <div class="card-header font-weight-bold">Корпус №2</div>
+      <table class="table table-bordered">
         <thead>
           <tr>
             <td>комната</td>
@@ -192,60 +195,60 @@ $(document).ready(function () {
   });
   $('.selected').select2();
 
-    $('.price').keypress(function (e) {
-      if (e.which == 13) {
-        var price = $(this).val();
-        var room = $(this).data('room');
-        var number = $(this).data('number');
-        $.ajax({
-          headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-          method: 'POST',
-          url: "{{ route('cabinet.updateroominfo') }}",
-          data: {_method: 'PUT', roomid: room, priceofroom: price, roomnumber:number},
-          success: function () {
-            bootbox.alert({
-              title: 'Обновлено!',
-              message: 'данные комнаты были изменены!',
-              callback: function () {
-                setTimeout("location.reload(true);", 100);
-              }
-            });
+  $('.price').keypress(function (e) {
+    if (e.which == 13) {
+      var price = $(this).val();
+      var room = $(this).data('room');
+      var number = $(this).data('number');
+      $.ajax({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        method: 'POST',
+        url: "{{ route('cabinet.updateroominfo') }}",
+        data: {_method: 'PUT', roomid: room, priceofroom: price, roomnumber: number},
+        success: function () {
+          bootbox.alert({
+            title: 'Обновлено!',
+            message: 'данные комнаты были изменены!',
+            callback: function () {
+              setTimeout("location.reload(true);", 100);
+            }
+          });
 
-          },
-          error: function (data) {
-            console.log(data);
-          }
-        });
-      }
-    });
+        },
+        error: function (data) {
+          console.log(data);
+        }
+      });
+    }
+  });
 
 
-    $('.comments').keypress(function (e) {
-      if (e.which == 13) {
-        var commet = $(this).val();
-        var room = $(this).data('room');
-        var number = $(this).data('number');
-        $.ajax({
-          headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-          method: 'POST',
-          url: "{{ route('cabinet.updateroominfocomment') }}",
-          data: {_method: 'PUT', roomid: room, commentofroom: commet, roomnumber:number},
-          success: function () {
-            bootbox.alert({
-              title: 'Обновлено!',
-              message: 'данные комнаты были изменены!',
-              callback: function () {
-                setTimeout("location.reload(true);", 100);
-              }
-            });
+  $('.comments').keypress(function (e) {
+    if (e.which == 13) {
+      var commet = $(this).val();
+      var room = $(this).data('room');
+      var number = $(this).data('number');
+      $.ajax({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        method: 'POST',
+        url: "{{ route('cabinet.updateroominfocomment') }}",
+        data: {_method: 'PUT', roomid: room, commentofroom: commet, roomnumber: number},
+        success: function () {
+          bootbox.alert({
+            title: 'Обновлено!',
+            message: 'данные комнаты были изменены!',
+            callback: function () {
+              setTimeout("location.reload(true);", 100);
+            }
+          });
 
-          },
-          error: function (data) {
-            console.log(data);
-          }
-        });
-      }
-    });
+        },
+        error: function (data) {
+          console.log(data);
+        }
+      });
+    }
+  });
 
 });
 </script>
