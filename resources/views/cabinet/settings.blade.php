@@ -1,7 +1,6 @@
 @extends('cabinet.layouts.index')
 @section('title', 'Настройки')
 @section('content')
-
 <div class="row">
   <div class="col-2">
     <div class="card">
@@ -53,10 +52,10 @@
     </div>
 
     <div class="card">
-      <div class="card-header bg-blue-400">Управление базой данных</div>
+      <div class="card-header bg-blue-400">Управление</div>
       <div class="card-body">
         <a class="btn" href="{{route('cabinet.getClear')}}">Очистить кеш сайта</a>
-        
+        <a class="btn" href="{{route('cabinet.siteactionlog')}}">Перейти на страницу логов</a>
       </div>
     </div>
   </div>
@@ -105,7 +104,6 @@
         <p class=""><b>Активация месяца</b> - для активации месяца Вам нужно нажать на добавленный при перезагрузки у Вас отобразится в меню Активный месяц</p>
       </div>
     </div>
-
 
   </div>
   <div class="col-3">

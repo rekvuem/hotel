@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Кабінет | @yield('title')</title>  
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" href="{{asset('favicon.png')}}" type="image/x-icon">
+    <link rel="icon" href="{{asset('favicon.ico')}}" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
     <link href="{{ asset('theme/global_assets/css/icons/material/styles.min.css') }} " rel="stylesheet" />
     <link href="{{ asset('theme/global_assets/css/icons/icomoon/styles.min.css') }} " rel="stylesheet" />

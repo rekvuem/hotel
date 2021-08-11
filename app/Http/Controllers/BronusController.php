@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Carbon\CarbonPeriod;
+
 
 class BronusController extends Controller {
 
@@ -44,26 +44,26 @@ class BronusController extends Controller {
         ->get();
 
 //    массив с ключами для быстрого определения и построения таблиц с данными
-    $r = 0;
+    $rs = 0;
     foreach ($TakeRoomys as $idroom)
     {
-      $takemyroom[$r]['rowid']   = $idroom->id;
-      $takemyroom[$r]['bornid']  = $idroom->id_bron;
-      $takemyroom[$r]['roomid']  = $idroom->room_id;
-      $takemyroom[$r]['monthid'] = $idroom->month_id;
-      $takemyroom[$r]['day']     = $idroom->day;
-      $takemyroom[$r]['month']   = $idroom->month_year;
-      $takemyroom[$r]['bron']    = $idroom->bron_info_id;
-      
-      $takemyroom[$r]['start_date']    = $idroom->bron_start_date;
-      $takemyroom[$r]['end_date']    = $idroom->bron_end_date;
+      $takemyroom[$rs]['rowid']   = $idroom->id;
+      $takemyroom[$rs]['bornid']  = $idroom->id_bron;
+      $takemyroom[$rs]['roomid']  = $idroom->room_id;
+      $takemyroom[$rs]['monthid'] = $idroom->month_id;
+      $takemyroom[$rs]['day']     = $idroom->day;
+      $takemyroom[$rs]['month']   = $idroom->month_year;
+      $takemyroom[$rs]['bron']    = $idroom->bron_info_id;
 
-      $takemyroom[$r]['takeVid'] = $idroom->takeVid;
-      $takemyroom[$r]['fio']     = $idroom->fio;
-      $takemyroom[$r]['telehon'] = $idroom->telehon;
-      $takemyroom[$r]['comment'] = $idroom->comment;
+      $takemyroom[$rs]['start_date'] = $idroom->bron_start_date;
+      $takemyroom[$rs]['end_date']   = $idroom->bron_end_date;
 
-      $r++;
+      $takemyroom[$rs]['takeVid'] = $idroom->takeVid;
+      $takemyroom[$rs]['fio']     = $idroom->fio;
+      $takemyroom[$rs]['telehon'] = $idroom->telehon;
+      $takemyroom[$rs]['comment'] = $idroom->comment;
+
+      $rs++;
     }
 
     return view('cabinet.fulllist', compact([
@@ -118,15 +118,15 @@ class BronusController extends Controller {
     /* ================== ЛОГИ ========================================================= */
     $select_number = DB::table('rooms')->where('id_room', $roomos)->first();
     $LogAction     = [
-      'action'      => 'бронирование номера',
-      'vid'         => $takeVid,
-      'date_bron'   => $z_format_start . '-' . $z_format_end,
-      'korpus'      => $korpus,
-      'id_room'     => $roomos,
-      'number_room' => $select_number->room,
-      'fio'         => $fio,
-      'tel'         => $tel,
-      'comment'     => $forText,
+      'действие'          => 'бронирование номера',
+      'тип занятости'     => $takeVid,
+      'дата бронирование' => $z_format_start . '-' . $z_format_end,
+      'корпус'            => $korpus,
+      'ид комната'        => $roomos,
+      'номер комнаты'     => $select_number->room,
+      'фио'               => $fio,
+      'тел'               => $tel,
+      'комментарий'       => $forText,
     ];
     $this->MyActionLogs(Auth::id(), $LogAction);
     /* ================== /ЛОГИ ========================================================= */

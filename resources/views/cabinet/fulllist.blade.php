@@ -15,7 +15,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
-   
+
   }
 </style>
 <div class="preloader">
@@ -26,105 +26,106 @@
   </div>
 </div>
 
+
 <div class="row">
   <div class="col-12">
-      <table class="table table-bordered table-responsive datatable-basic">
-        <thead>
-          <tr class="text-center text-bold bg-slate-700" style="font-size: 1.3em; ">
-            <th>Дні</th>
-            @foreach($TakeRoom as $room) 
-            <th>{{ $room->room }}</th>
-            @endforeach  
-          </tr>
-        </thead>
-        <tbody> 
-          @for ($i = 1; $i <= $carbon_days; $i++) 
-          <tr>        
-            <td class="bg-slate-700">{{$i}}</td>
-            @foreach($takemyroom as $bron)
-            @php
-            switch ($bron['takeVid']){
-            case 'заселен': $takeVidType= 'bg-teal-800';
-            break;
-            case 'забронирован': $takeVidType= 'bg-brown-800';
-            break;
-            case 'выселен' : $takeVidType= 'bg-grey-800';
-            break;
-            case 'свободно': $takeVidType= 'bg-white';
-            break;
-            case 'уборка': $takeVidType= 'bg-blue-800';
-            break;
-            case 'ремонт': $takeVidType= 'bg-danger-800';
-            break;
-            default: $takeVidType= ' ';
-            break;
-            }
-            @endphp
+    <table class="table table-bordered table-responsive datatable-basic">
+      <thead>
+        <tr class="text-center text-bold bg-slate-700" style="font-size: 1.3em; ">
+          <th>Дні</th>
+          @foreach($TakeRoom as $room) 
+          <th>{{ $room->room }}</th>
+          @endforeach  
+        </tr>
+      </thead>
+      <tbody> 
+        @for ($i = 1; $i <= $carbon_days; $i++) 
+        <tr>        
+          <td class="bg-slate-700">{{$i}}</td>
+          @foreach($takemyroom as $bron)
+          @php
+          switch ($bron['takeVid']){
+          case 'заселен': $takeVidType= 'bg-teal-800';
+          break;
+          case 'забронирован': $takeVidType= 'bg-brown-800';
+          break;
+          case 'выселен' : $takeVidType= 'bg-grey-800';
+          break;
+          case 'свободно': $takeVidType= 'bg-white';
+          break;
+          case 'уборка': $takeVidType= 'bg-blue-800';
+          break;
+          case 'ремонт': $takeVidType= 'bg-danger-800';
+          break;
+          default: $takeVidType= ' ';
+          break;
+          }
+          @endphp
 
-            @if($bron['day'] == $i)
-            @if($bron['bron'] == null)
-            <td class="{{$takeVidType}}" style="cursor: pointer">
+          @if($bron['day'] == $i)
+          @if($bron['bron'] == null)
+          <td class="{{$takeVidType}}" style="cursor: pointer">
 
-              <a href="#" 
-                 class="btn-icon takeday_information text-purple-800" 
-                 data-room="{{ $bron['roomid'] }}" 
-                 data-month="{{ $bron['monthid'] }}"
-                 data-rangedate="{{ $bron['day'] }}.{{ $bron['month'] }}"
+            <a href="#" 
+               class="btn-icon takeday_information text-purple-800" 
+               data-room="{{ $bron['roomid'] }}" 
+               data-month="{{ $bron['monthid'] }}"
+               data-rangedate="{{ $bron['day'] }}.{{ $bron['month'] }}"
+               data-toggle="modal" 
+               data-target="#modal_theme_bg_custom"><i class="icon-pencil5"></i></a>
+
+          </td>
+          @elseif($bron['takeVid'] == 'ремонт')
+          <td class="{{$takeVidType}}" 
+              style="cursor: pointer; font-weight: bold; font-size: 1.1em; font-style: italic">
+            <span class="float-left">ремонт комнаты</span>
+            <span class="float-right delete" 
+                  data-bron="{{ $bron['bron'] }}"
+                  data-room="{{ $bron['roomid'] }}"
+                  data-start="{{ $bron['start_date'] }}"
+                  data-end="{{ $bron['end_date'] }}"
+                  ><i class="mi-delete"></i></span>
+          </td>
+          @elseif($bron['takeVid'] == 'уборка')
+
+          <td class="{{$takeVidType}}" 
+              style="cursor: pointer; font-weight: bold; font-size: 1.1em; font-style: italic">
+            <span class="float-left">уборка комнаты</span>
+            <span class="float-right delete" 
+                  data-bron="{{ $bron['bron'] }}"
+                  data-room="{{ $bron['roomid'] }}"
+                  data-start="{{ $bron['start_date'] }}"
+                  data-end="{{ $bron['end_date'] }}"
+                  ><i class="mi-delete"></i></span>
+          </td>
+
+          @else 
+          <td class="{{$takeVidType}}">
+            <div title="тип заннятости" class="changeTypeVid" 
+                 data-bron="{{ $bron['bornid'] }}"
                  data-toggle="modal" 
-                 data-target="#modal_theme_bg_custom"><i class="icon-pencil5"></i></a>
-
-            </td>
-            @elseif($bron['takeVid'] == 'ремонт')
-            <td class="{{$takeVidType}}" 
-                style="cursor: pointer; font-weight: bold; font-size: 1.1em; font-style: italic">
-              <span class="float-left">ремонт комнаты</span>
-              <span class="float-right delete" 
+                 data-target="#modal_edit_vid"
+                 style="cursor: pointer; width: 150px; font-style: italic; font-weight: bold;">
+              {{ $bron['takeVid'] }}              
+            </div>
+            <div class="" title="Имя Фамилия гостя" style="font-weight: bold;">{{ $bron['fio'] }}</div>
+            <div class="" title="телефон">{{ $bron['telehon'] }}</div>
+            <div class="" title="комментарий">{{ $bron['comment'] }}</div>
+            <div class="text-center ">  
+              <span class="delete"   
                     data-bron="{{ $bron['bron'] }}"
                     data-room="{{ $bron['roomid'] }}"
                     data-start="{{ $bron['start_date'] }}"
-                    data-end="{{ $bron['end_date'] }}"
-                    ><i class="mi-delete"></i></span>
-            </td>
-            @elseif($bron['takeVid'] == 'уборка')
-
-            <td class="{{$takeVidType}}" 
-                style="cursor: pointer; font-weight: bold; font-size: 1.1em; font-style: italic">
-              <span class="float-left">уборка комнаты</span>
-              <span class="float-right delete" 
-                    data-bron="{{ $bron['bron'] }}"
-                    data-room="{{ $bron['roomid'] }}"
-                    data-start="{{ $bron['start_date'] }}"
-                    data-end="{{ $bron['end_date'] }}"
-                    ><i class="mi-delete"></i></span>
-            </td>
-
-            @else 
-            <td class="{{$takeVidType}}">
-              <div title="тип заннятости" class="changeTypeVid" 
-                   data-bron="{{ $bron['bornid'] }}"
-                   data-toggle="modal" 
-                   data-target="#modal_edit_vid"
-                   style="cursor: pointer; width: 150px; font-style: italic; font-weight: bold;">
-                {{ $bron['takeVid'] }}              
-              </div>
-              <div class="" title="Имя Фамилия гостя" style="font-weight: bold;">{{ $bron['fio'] }}</div>
-              <div class="" title="телефон">{{ $bron['telehon'] }}</div>
-              <div class="" title="комментарий">{{ $bron['comment'] }}</div>
-              <div class="text-center ">  
-                <span class="delete"   
-                      data-bron="{{ $bron['bron'] }}"
-                      data-room="{{ $bron['roomid'] }}"
-                      data-start="{{ $bron['start_date'] }}"
-                      data-end="{{ $bron['end_date'] }}"><i class="mi-delete text-danger-300"></i></span>   
-              </div>
-            </td>
-            @endif
-            @endif
-            @endforeach
-          </tr>
-          @endfor 
-        </tbody>          
-      </table>
+                    data-end="{{ $bron['end_date'] }}"><i class="mi-delete text-danger-300"></i></span>   
+            </div>
+          </td>
+          @endif
+          @endif
+          @endforeach
+        </tr>
+        @endfor 
+      </tbody>          
+    </table>
   </div>
 </div>
 
@@ -219,26 +220,15 @@
 <script src="{{ asset('theme/global_assets/js/plugins/forms/selects/select2.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('theme/global_assets/js/plugins/notifications/bootbox.min.js') }}"></script>
 <script>
-            $(document).ready(function () {
-              $(window).on('load', function () {
-                // Start
-                $('#h-right-basic-start').on('click', function () {
-                  var $pb = $('#h-right-basic .progress-bar');
-                  $pb.attr('data-transitiongoal', $pb.attr('data-transitiongoal-backup'));
-                  $pb.progressbar();
-                });
-
-                // Reset
-                $('#h-right-basic-reset').on('click', function () {
-                  theme_squares
-                  $('#h-right-basic .progress-bar').attr('data-transitiongoal', 0).progressbar();
-                });
-                var $preloader = $('.pace-demo'),
+              $(window).on('load', function(){
+                                var $preloader = $('.pace-demo'),
                         $loader = $preloader.find('.pace_activity');
                 $loader.fadeOut();
                 $preloader.delay(250).fadeOut(200);
                 $('.preloader').delay(250).fadeOut(200);
               });
+            $(document).ready(function () {
+
 //////////////////////////////////////////////////////////////////////////////////
               $('.datatable-basic').DataTable({
                 fixedHeader: {

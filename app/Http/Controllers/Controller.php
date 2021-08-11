@@ -21,7 +21,7 @@ class Controller extends BaseController
     DB::table('action_logs')->insertOrIgnore([
       'user_id' => $user,
       'action' => json_encode($actions, JSON_UNESCAPED_UNICODE),
-      'action_date' => date('Y-m-d'),
+      'action_date' => now(),
     ]);
     
     

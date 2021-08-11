@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\BronusController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\AjaxController;
+use App\Http\Controllers\AjaxInsertController;
 use Illuminate\Http\Request;
 
 /*
@@ -48,8 +49,8 @@ Route::prefix('/cabinet')->name('cabinet.')->namespace('Cabinet')->middleware(['
   Route::put('/updateroominfo', [AjaxController::class, 'updateInfoRoom'])->name('updateroominfo');
   Route::put('/updateroomcomment', [AjaxController::class, 'updateInfoComment'])->name('updateroominfocomment'); 
   
-  Route::post('/insertAjaxbron', [AjaxController::class, 'insertAjaxBron'])->name('insertAjaxBron');
-  Route::post('/insertFastBron', [AjaxController::class, 'insertFastBron'])->name('insertFastBron');
+  Route::post('/insertAjaxbron', [AjaxInsertController::class, 'insertAjaxBron'])->name('insertAjaxBron');
+  Route::post('/insertFastBron', [AjaxInsertController::class, 'insertFastBron'])->name('insertFastBron');
   /*   * ************************************************************************************************** */
   /*   * ***********************************    Settings    *********************************************** */
   /*   * ************************************************************************************************** */
@@ -59,14 +60,10 @@ Route::prefix('/cabinet')->name('cabinet.')->namespace('Cabinet')->middleware(['
   Route::get('/updateyear', [SettingController::class, 'updateYearKorp'])->name('updateyearkorp');
 
   Route::get('/updateyear/{year}', [SettingController::class, 'updateYear'])->name('updateyear'); // активировать год на вкладке комнаты
-
-
-
+  Route::get('/logs', [SettingController::class, 'showactionlog'])->name('siteactionlog');
+  
   Route::get('/getClear', function () {
-    Artisan::call('config:clear');
-    Artisan::call('cache:clear');
-    Artisan::call('view:clear');
-    Artisan::call('route:clear');
+    Artisan::call('optimize');
     return redirect()->route('cabinet.setting');
   })->name('getClear');
 });

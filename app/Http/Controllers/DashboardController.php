@@ -13,19 +13,20 @@ class DashboardController extends Controller {
   /* ====================================================================================== */
 
   public function dashboard(Request $request) {
-    $User_month = DB::table('user_active_year')->where('user_id', Auth::id())->first();
+    $User_month      = DB::table('user_active_year')->where('user_id', Auth::id())->first();
     $User_month_year = DB::table('month')->where('id', $User_month->month_id)->first();
-    if(empty($User_month->month_id)){
-    
-    }else{
+    if (empty($User_month->month_id))
+    {
+      
+    } else
+    {
       Cookie::queue(Cookie::forever('monthing', $User_month->month_id));
       Cookie::queue(Cookie::forever('month_year_text', $User_month_year->month_year));
     }
-    $carbon_now = Carbon::now();
+    $carbon_now       = Carbon::now();
     $parse_carbon_now = Carbon::parse($carbon_now);
-    $time = $parse_carbon_now->year."-".$parse_carbon_now->month."-".$parse_carbon_now->day;
+    $time             = $parse_carbon_now->year . "-" . $parse_carbon_now->month . "-" . $parse_carbon_now->day;
 
-    
     $getBron_now = DB::table('bron')
         ->where('month_year', '=', $time)
         ->leftJoin('rooms', 'bron.room_id', '=', 'rooms.id_room')
@@ -50,7 +51,7 @@ class DashboardController extends Controller {
     {
       abort('403', 'Активируйте актуальный месяц в настройках!');
     }
-    
+
     $carbon_month = Carbon::parse($month->year . '-' . $month->month);
     $carbon_days  = $carbon_month->daysInMonth;
 
@@ -59,7 +60,7 @@ class DashboardController extends Controller {
         ->where('room_id', $sel)
         ->leftJoin('bron_info', 'bron.bron_info_id', '=', 'bron_info.id_bron')
         ->where('month_id', $month->id)
-       ->leftJoin('month', 'bron.month_id', '=', 'month.id')
+        ->leftJoin('month', 'bron.month_id', '=', 'month.id')
         ->where('month_id', $month->id)
         ->get();
 
